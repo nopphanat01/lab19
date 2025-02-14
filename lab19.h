@@ -68,6 +68,55 @@ void Unit::newTurn(){
 /////////////////////////////////////////////////////////////////////////////////////
 //Write function members isDead(), guard(), heal(), beAttacked(), and attack() here//
 /////////////////////////////////////////////////////////////////////////////////////
+bool Unit::isDead() {
+    return hp <= 0;  // ถ้า hp น้อยกว่าหรือเท่ากับ 0 จะ return true, ถ้าไม่จะ return false
+}
+
+void Unit::guard() {
+    guard_on = true;  // เมื่อเรียกใช้ฟังก์ชัน guard() จะทำให้ guard_on เป็น true
+}
+
+int Unit::beAttacked(int enemyAtk) {
+    int damage;
+    
+    // ถ้าตัวละครไม่ได้ป้องกัน
+    if (!guard_on) {
+        damage = enemyAtk - def;  // ความเสียหาย = atk ของศัตรู - def ของตัวละคร
+    } 
+    // ถ้าตัวละครป้องกัน
+    else {
+        damage = (enemyAtk - def) / 3;  // ความเสียหาย = (atk ของศัตรู - def ของตัวละคร) / 3
+    }
+    
+    // ตรวจสอบถ้าความเสียหายเป็นลบ (ไม่สามารถติดลบได้) ให้กำหนดเป็น 0
+    if (damage < 0) {
+        damage = 0;
+    }
+
+    // ลด hp ของตัวละครที่ถูกโจมตี
+    hp -= damage;
+
+    // คืนค่าความเสียหายที่ได้รับ
+    return damage;
+}
+
+int Unit::attack(Unit &target) {
+    return target.beAttacked(atk);  // เรียกใช้ beAttacked() ของ target (Unit ที่ถูกโจมตี) และส่งค่าพลังโจมตี (atk) ไป
+}
+
+int Unit::heal() {
+    int healAmount = rand() % 21 + 10;  // สุ่มค่าระหว่าง 10 ถึง 30
+    int actualHeal = 0;
+    
+    // คำนวณค่าฟื้นฟูจริงที่สามารถทำได้
+    if (hp < hpmax) {
+        actualHeal = min(healAmount, hpmax - hp);  // ฟื้นฟูไม่ให้เกินค่า hpmax
+        hp += actualHeal;  // เพิ่มค่า hp ตามที่ฟื้นฟูได้
+    }
+    
+    return actualHeal;  // คืนค่าการฟื้นฟูที่เกิดขึ้นจริง
+}
+
 
 
 
